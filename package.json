@@ -1,11 +1,19 @@
 {
-  "name": "Chessboard",
+  "name": "chessboard",
   "version": "0.0.1",
-  "description": "Chess board",
+  "description": "Simple chess board",
   "main": "chessboard.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Oleg Spakov",
-  "license": "BSD-2-Clause"
+  "license": "BSD-2-Clause",
+  "repository": {
+    "type": "git",
+    "url": "git+https://lexasss@github.com/lexasss/chessboard.git"
+  },
+  "bugs": {
+    "url": "https://github.com/lexasss/chessboard/issues"
+  },
+  "homepage": "https://github.com/lexasss/chessboard#readme"
 }

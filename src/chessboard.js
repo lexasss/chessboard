@@ -47,12 +47,12 @@ class Chessboards {
  * |-------------------------------------|
  * |   |                             |   |
  * | 1 |                             | 1 |
- * | - |    board: flex container    | - |
- * | 9 |                             | 9 |
+ * | - |                             | - |
+ * | 9 |    board: flex container    | 9 |
  * |   |        with 64 cells,       |   |
  * | l |                             | l |
- * | a |        cell classes:        | a |
- * | b |                             | b |
+ * | a |                             | a |
+ * | b |        cell classes:        | b |
  * | e |     from 'a1' to 'h8' +     | e |
  * | l |         'even'/'odd'        | l |
  * | s |                             | s |
