@@ -63,7 +63,7 @@ body {
     width: var(--board-size);
     height: var(--board-size);
 
-    font-size: 20pt;
+    font-size: 18pt;
 }
 
 .cell {
@@ -82,7 +82,7 @@ body {
 
 .white {
     color: #fff;
-    text-shadow: 0 0 4px #000;
+    text-shadow: 2px 0px #000, -2px 0px #000, 0px 2px #000, 0px -2px #000;
 }
 
 .black {
