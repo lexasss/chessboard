@@ -1,0 +1,90 @@
+:root {
+    --cell-size: 34px;
+    --board-size: calc(var(--cell-size) * 8);
+    --frame-size: 1em;
+}
+
+body {
+	background-color: #fff;
+	font: bold 14pt Calibri, Arial, sans-serif;
+    color: #444;
+	text-align: center;
+    padding: 0;
+    margin: 0;
+}
+
+.main-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.main-container-row {
+	display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-around;
+
+    padding: 1em;
+}
+
+.board-container {
+    background-color: #999;
+}
+
+.rowBoard {
+    display: flex;
+}
+
+.h-side {
+    margin: 0 var(--frame-size);
+    display: flex;
+}
+
+.v-side {
+    display: flex;
+    flex-direction: column;
+}
+
+.horizontal-cell {
+    line-height: var(--frame-size);
+    height: var(--frame-size);
+    width: var(--cell-size);
+}
+
+.vertical-cell {
+    line-height: var(--cell-size);
+    height: var(--cell-size);
+    width: var(--frame-size);
+}
+
+.board {
+    display: flex;
+    flex-wrap: wrap;
+
+    width: var(--board-size);
+    height: var(--board-size);
+
+    font-size: 20pt;
+}
+
+.cell {
+    width: var(--cell-size);
+    height: var(--cell-size);
+    line-height: var(--cell-size);
+}
+
+.cell.even {
+    background-color: #ccc;
+}
+
+.cell.odd {
+    background-color: #fff;
+}
+
+.white {
+    color: #fff;
+    text-shadow: 0 0 4px #000;
+}
+
+.black {
+    color: #222;
+}

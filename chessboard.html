@@ -1,0 +1,45 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <title>Chessboard</title>
+        <meta charset="UTF-8">
+
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.10/css/all.css" integrity="sha384-+d0P83n9kaQMCwj8F4RJB66tzIwOKmrdb46+porD/OvrJ+37WqIM7UoBtwHO6Nlg" crossorigin="anonymous">
+        <link rel="stylesheet" href="chessboard.css" type="text/css">
+
+    	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="chessboard.js" type="text/javascript"></script>
+        <script type="text/javascript">
+        	$(function () {
+                const container = new Chessboards( '#app', 2, 3 );
+                const b1 = container.boards[0];
+                for (let i = 0; i < 8; i++) {
+                    b1.setPiece( `${String.fromCharCode(0x61 + i)}2`, Chessboard.pieces.pawn, Chessboard.side.white );
+                }
+                b1.setPiece( `a1`, Chessboard.pieces.rook, Chessboard.side.white );
+                b1.setPiece( `b1`, Chessboard.pieces.knight, Chessboard.side.white );
+                b1.setPiece( `c1`, Chessboard.pieces.bishop, Chessboard.side.white );
+                b1.setPiece( `d1`, Chessboard.pieces.queen, Chessboard.side.white );
+                b1.setPiece( `e1`, Chessboard.pieces.king, Chessboard.side.white );
+                b1.setPiece( `f1`, Chessboard.pieces.bishop, Chessboard.side.white );
+                b1.setPiece( `g1`, Chessboard.pieces.knight, Chessboard.side.white );
+                b1.setPiece( `h1`, Chessboard.pieces.rook, Chessboard.side.white );
+
+                for (let i = 0; i < 8; i++) {
+                    b1.setPiece( `${String.fromCharCode(0x61 + i)}7`, Chessboard.pieces.pawn, Chessboard.side.black );
+                }
+                b1.setPiece( `a8`, Chessboard.pieces.rook, Chessboard.side.black );
+                b1.setPiece( `b8`, Chessboard.pieces.knight, Chessboard.side.black );
+                b1.setPiece( `c8`, Chessboard.pieces.bishop, Chessboard.side.black );
+                b1.setPiece( `d8`, Chessboard.pieces.queen, Chessboard.side.black );
+                b1.setPiece( `e8`, Chessboard.pieces.king, Chessboard.side.black );
+                b1.setPiece( `f8`, Chessboard.pieces.bishop, Chessboard.side.black );
+                b1.setPiece( `g8`, Chessboard.pieces.knight, Chessboard.side.black );
+                b1.setPiece( `h8`, Chessboard.pieces.rook, Chessboard.side.black );
+            });
+        </script>
+    </head>
+    <body>
+    	<div id="app"></div>
+    </body>
+</htnl>
