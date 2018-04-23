@@ -95,7 +95,7 @@ class Chessboard {
         container.append( hsideBottom );
     }
 
-    static get pieces() {
+    static get piece() {
         return {
             pawn: 'pawn',
             knight: 'knight',
@@ -113,14 +113,67 @@ class Chessboard {
         };
     }
 
+    clearPiece( cellID ) {
+        const cell = $( `#${this.id} .${cellID}` );
+        const pieces = Chessboard.piece;
+        const side = Chessboard.side;
+
+        for (let id in pieces) {
+            cell.removeClass( `fa-chess-${pieces[id]}` );
+        }
+        for (let id in side) {
+            cell.removeClass( side[id] );
+        }
+
+        return this;
+    }
+
     setPiece( cellID, pieceID, sideID ) {
-        const piece = $( `#${this.id} .${cellID}` );
-        if (pieceID) {
-            piece.addClass( sideID ).addClass( `fa-chess-${pieceID}` );
+
+        this.clearPiece( cellID );
+
+        $( `#${this.id} .${cellID}` )
+            .addClass( sideID )
+            .addClass( `fa-chess-${pieceID}` );
+
+        return this;
+    }
+
+    fill() {
+        for (let i = 0; i < 8; i++) {
+            this.setPiece( `${String.fromCharCode(0x61 + i)}2`, Chessboard.piece.pawn, Chessboard.side.white );
+            this.setPiece( `${String.fromCharCode(0x61 + i)}7`, Chessboard.piece.pawn, Chessboard.side.black );
         }
-        else {
-            piece.removeClass( `fa-chess-${pieceID}-alt` );
+
+        this.setPiece( `a1`, Chessboard.piece.rook, Chessboard.side.white );
+        this.setPiece( `b1`, Chessboard.piece.knight, Chessboard.side.white );
+        this.setPiece( `c1`, Chessboard.piece.bishop, Chessboard.side.white );
+        this.setPiece( `d1`, Chessboard.piece.queen, Chessboard.side.white );
+        this.setPiece( `e1`, Chessboard.piece.king, Chessboard.side.white );
+        this.setPiece( `f1`, Chessboard.piece.bishop, Chessboard.side.white );
+        this.setPiece( `g1`, Chessboard.piece.knight, Chessboard.side.white );
+        this.setPiece( `h1`, Chessboard.piece.rook, Chessboard.side.white );
+
+        this.setPiece( `a8`, Chessboard.piece.rook, Chessboard.side.black );
+        this.setPiece( `b8`, Chessboard.piece.knight, Chessboard.side.black );
+        this.setPiece( `c8`, Chessboard.piece.bishop, Chessboard.side.black );
+        this.setPiece( `d8`, Chessboard.piece.queen, Chessboard.side.black );
+        this.setPiece( `e8`, Chessboard.piece.king, Chessboard.side.black );
+        this.setPiece( `f8`, Chessboard.piece.bishop, Chessboard.side.black );
+        this.setPiece( `g8`, Chessboard.piece.knight, Chessboard.side.black );
+        this.setPiece( `h8`, Chessboard.piece.rook, Chessboard.side.black );
+
+        return this;
+    }
+
+    clear() {
+        for (let col = 0; col < 8; col++) {
+            for (let row = 0; row < 8; row++) {
+                this.clearPiece( `${String.fromCharCode(0x61 + col)}${row + 1}` );
+            }
         }
+
+        return this;
     }
 
     _createHSideCell( cellID ) {
