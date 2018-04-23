@@ -67,36 +67,36 @@ class Chessboard {
 
         this.id = id;
 
-        const container = $('<div>').addClass('board-container');
+        const container = $( '<div>' ).addClass( 'board-container' );
         parent.append( container );
 
-        const hsideTop = $('<div>').addClass('h-side');
-        const hsideBottom = $('<div>').addClass('h-side');
+        const hsideTop = $( '<div>' ).addClass( 'h-side' );
+        const hsideBottom = $( '<div> ').addClass( 'h-side' );
         for (let i = 0; i < 8; i++) {
             hsideTop.append( this._createHSideCell( i ) );
             hsideBottom.append( this._createHSideCell( i ) );
         }
 
-        const vsideLeft = $('<div>').addClass('v-row');
-        const vsideRight = $('<div>').addClass('v-row');
+        const vsideLeft = $(' <div>' ).addClass( 'v-row' );
+        const vsideRight = $( '<div>' ).addClass( 'v-row' );
         for (let i = 0; i < 8; i++) {
             vsideLeft.append( this._createVSideCell( i ) );
             vsideRight.append( this._createVSideCell( i ) );
         }
 
-        const board = $(`<div id="${id}">`).addClass('board');
+        const board = $( `<div id="${id}"> `).addClass( 'board' );
         for (let row = 0; row < 8; row++) {
             for (let col = 0; col < 8; col++) {
-                board.append( $('<i>')
+                board.append( $( '<i>' )
                     .addClass( 'cell' )
                     .addClass( 'fas' )
-                    .addClass( String.fromCharCode(0x61 + col) + (8 - row) )
+                    .addClass( String.fromCharCode( 0x61 + col ) + (8 - row) )
                     .addClass( (row + col) % 2 ? 'even' : 'odd' )
                 );
             }
         }
 
-        const rowBoard = $('<div>').addClass('rowBoard');
+        const rowBoard = $( '<div>' ).addClass( 'rowBoard' );
 
         rowBoard.append( vsideLeft );
         rowBoard.append( board );
@@ -126,7 +126,15 @@ class Chessboard {
     }
 
     clearPiece( cellID ) {
+        if (!cellID) {
+            console.warn( 'no cell ID' ); return this;
+        }
+
         const cell = $( `#${this.id} .${cellID}` );
+        if (!cell) {
+            console.warn( `cell ${cellID} does not exist` ); return this;
+        }
+        
         const pieces = Chessboard.piece;
         const side = Chessboard.side;
 
@@ -141,11 +149,18 @@ class Chessboard {
     }
 
     setPiece( cellID, pieceID, sideID ) {
+        if (!cellID) {
+            console.warn( 'no cell ID' ); return this;
+        }
 
         this.clearPiece( cellID );
 
-        $( `#${this.id} .${cellID}` )
-            .addClass( sideID )
+        const cell = $( `#${this.id} .${cellID}` );
+        if (!cell) {
+            return this;
+        }
+        
+        cell.addClass( sideID )
             .addClass( `fa-chess-${pieceID}` );
 
         return this;
@@ -153,8 +168,8 @@ class Chessboard {
 
     fill() {
         for (let i = 0; i < 8; i++) {
-            this.setPiece( `${String.fromCharCode(0x61 + i)}2`, Chessboard.piece.pawn, Chessboard.side.white );
-            this.setPiece( `${String.fromCharCode(0x61 + i)}7`, Chessboard.piece.pawn, Chessboard.side.black );
+            this.setPiece( `${String.fromCharCode( 0x61 + i )}2`, Chessboard.piece.pawn, Chessboard.side.white );
+            this.setPiece( `${String.fromCharCode( 0x61 + i )}7`, Chessboard.piece.pawn, Chessboard.side.black );
         }
 
         this.setPiece( `a1`, Chessboard.piece.rook, Chessboard.side.white );
@@ -181,7 +196,7 @@ class Chessboard {
     clear() {
         for (let col = 0; col < 8; col++) {
             for (let row = 0; row < 8; row++) {
-                this.clearPiece( `${String.fromCharCode(0x61 + col)}${row + 1}` );
+                this.clearPiece( `${String.fromCharCode( 0x61 + col )}${row + 1}` );
             }
         }
 
@@ -189,10 +204,10 @@ class Chessboard {
     }
 
     _createHSideCell( cellID ) {
-        return $(`<div>${String.fromCharCode(0x61 + cellID)}</div>`).addClass('horizontal-cell');
+        return $( `<div>${String.fromCharCode( 0x61 + cellID )}</div>` ).addClass( 'horizontal-cell' );
     }
 
     _createVSideCell( cellID ) {
-        return $(`<div>${8 - cellID}</div>`).addClass('vertical-cell');
+        return $( `<div>${8 - cellID}</div>` ).addClass( 'vertical-cell ');
     }
 }

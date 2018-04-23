@@ -10,11 +10,32 @@
     	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
         <script src="chessboard.js" type="text/javascript"></script>
         <script type="text/javascript">
-        	$(function () {
+        	$(() => {
                 const container = new Chessboards( '#app', 2, 3 );
 
+                const p = Chessboard.piece;
+                const s = Chessboard.side;
+
+                container.boards[0]
+                    .setPiece( 'c4', p.queen, s.white )
+                    .setPiece( 'd8', p.queen, s.black )
+                    .setPiece( 'g3', p.knight, s.black )
+                    .setPiece( 'e5', p.bishop, s.white )
+                    .setPiece( 'f8', p.king, s.black )
+                    .setPiece( 'e1', p.king, s.white )
+                    .setPiece( 'f7', p.pawn, s.black )
+                    .setPiece( 'g7', p.pawn, s.black )
+                    .setPiece( 'g6', p.pawn, s.black )
+                    .setPiece( 'b5', p.pawn, s.black )
+                    .setPiece( 'd5', p.pawn, s.white )
+                    .setPiece( 'c6', p.pawn, s.white );
+
+                container.boards[1]
+                    .setPiece( '', p.queen, s.white );
+
+                    
                 // example: fill the board and clear one white rook out
-                // container.boards[0].fill().clearPiece( 'a1' );
+                //container.boards[0].fill().clearPiece( 'a1' );
 
                 // example: set task pieces
                 /*
