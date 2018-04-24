@@ -29,6 +29,16 @@
                     .setPiece( 'b5', p.pawn, s.black )
                     .setPiece( 'd5', p.pawn, s.white )
                     .setPiece( 'c6', p.pawn, s.white );
+                    
+                container.boards[1]
+                    .set.white.queen.to.f6
+                    .set.black.king.to.c8
+                    .set.black.knight.to.g3
+                    .set.white.king.to.d1
+                    .set.white.pawn.to.d3
+                    .set.white.pawn.to.a5
+                    .set.black.pawn.to.d7
+                    .set.black.rook.to.f5;
 
                 // example: fill the board and clear one white rook out
                 // container.boards[0].fill().clearPiece( 'a1' );
