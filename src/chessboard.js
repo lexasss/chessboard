@@ -125,70 +125,77 @@ class Chessboard {
         };
     }
 
-    clearPiece( cellID ) {
-        if (!cellID) {
+    get set() { return new SetPieceRequest( this ); }
+    get put() { return new SetPieceRequest( this ); }
+    get place() { return new SetPieceRequest( this ); }
+
+    clearPiece( cell ) {
+        if (!cell) {
             console.warn( 'no cell ID' ); return this;
         }
 
-        const cell = $( `#${this.id} .${cellID}` );
-        if (!cell) {
-            console.warn( `cell ${cellID} does not exist` ); return this;
+        const el = $( `#${this.id} .${cell}` );
+        if (!el) {
+            console.warn( `cell ${cell} does not exist` ); return this;
         }
         
         const pieces = Chessboard.piece;
         const side = Chessboard.side;
 
         for (let id in pieces) {
-            cell.removeClass( `fa-chess-${pieces[id]}` );
+            el.removeClass( `fa-chess-${pieces[id]}` );
         }
         for (let id in side) {
-            cell.removeClass( side[id] );
+            el.removeClass( side[id] );
         }
 
         return this;
     }
 
-    setPiece( cellID, pieceID, sideID ) {
-        if (!cellID) {
+    setPiece( cell, piece, side ) {
+        if (!cell) {
             console.warn( 'no cell ID' ); return this;
         }
 
-        this.clearPiece( cellID );
+        this.clearPiece( cell );
 
-        const cell = $( `#${this.id} .${cellID}` );
-        if (!cell) {
+        const el = $( `#${this.id} .${cell}` );
+        if (!el) {
             return this;
         }
         
-        cell.addClass( sideID )
-            .addClass( `fa-chess-${pieceID}` );
+        el.addClass( side )
+            .addClass( `fa-chess-${piece}` );
 
         return this;
     }
 
     fill() {
+        const p = Chessboard.piece;
+        const s = Chessboard.side;
+
         for (let i = 0; i < 8; i++) {
-            this.setPiece( `${String.fromCharCode( 0x61 + i )}2`, Chessboard.piece.pawn, Chessboard.side.white );
-            this.setPiece( `${String.fromCharCode( 0x61 + i )}7`, Chessboard.piece.pawn, Chessboard.side.black );
+            this.setPiece( `${String.fromCharCode( 0x61 + i )}2`, p.pawn, s.white );
+            this.setPiece( `${String.fromCharCode( 0x61 + i )}7`, p.pawn, s.black );
         }
 
-        this.setPiece( `a1`, Chessboard.piece.rook, Chessboard.side.white );
-        this.setPiece( `b1`, Chessboard.piece.knight, Chessboard.side.white );
-        this.setPiece( `c1`, Chessboard.piece.bishop, Chessboard.side.white );
-        this.setPiece( `d1`, Chessboard.piece.queen, Chessboard.side.white );
-        this.setPiece( `e1`, Chessboard.piece.king, Chessboard.side.white );
-        this.setPiece( `f1`, Chessboard.piece.bishop, Chessboard.side.white );
-        this.setPiece( `g1`, Chessboard.piece.knight, Chessboard.side.white );
-        this.setPiece( `h1`, Chessboard.piece.rook, Chessboard.side.white );
+        this.setPiece( `a1`, p.rook, s.white );
+        this.setPiece( `b1`, p.knight, s.white );
+        this.setPiece( `c1`, p.bishop, s.white );
+        this.setPiece( `d1`, p.queen, s.white );
+        this.setPiece( `e1`, p.king, s.white );
+        this.setPiece( `f1`, p.bishop, s.white );
+        this.setPiece( `g1`, p.knight, s.white );
+        this.setPiece( `h1`, p.rook, s.white );
 
-        this.setPiece( `a8`, Chessboard.piece.rook, Chessboard.side.black );
-        this.setPiece( `b8`, Chessboard.piece.knight, Chessboard.side.black );
-        this.setPiece( `c8`, Chessboard.piece.bishop, Chessboard.side.black );
-        this.setPiece( `d8`, Chessboard.piece.queen, Chessboard.side.black );
-        this.setPiece( `e8`, Chessboard.piece.king, Chessboard.side.black );
-        this.setPiece( `f8`, Chessboard.piece.bishop, Chessboard.side.black );
-        this.setPiece( `g8`, Chessboard.piece.knight, Chessboard.side.black );
-        this.setPiece( `h8`, Chessboard.piece.rook, Chessboard.side.black );
+        this.setPiece( `a8`, p.rook, s.black );
+        this.setPiece( `b8`, p.knight, s.black );
+        this.setPiece( `c8`, p.bishop, s.black );
+        this.setPiece( `d8`, p.queen, s.black );
+        this.setPiece( `e8`, p.king, s.black );
+        this.setPiece( `f8`, p.bishop, s.black );
+        this.setPiece( `g8`, p.knight, s.black );
+        this.setPiece( `h8`, p.rook, s.black );
 
         return this;
     }
@@ -203,11 +210,61 @@ class Chessboard {
         return this;
     }
 
-    _createHSideCell( cellID ) {
-        return $( `<div>${String.fromCharCode( 0x61 + cellID )}</div>` ).addClass( 'horizontal-cell' );
+    _createHSideCell( cell ) {
+        return $( `<div>${String.fromCharCode( 0x61 + cell )}</div>` ).addClass( 'horizontal-cell' );
     }
 
-    _createVSideCell( cellID ) {
-        return $( `<div>${8 - cellID}</div>` ).addClass( 'vertical-cell ');
+    _createVSideCell( cell ) {
+        return $( `<div>${8 - cell}</div>` ).addClass( 'vertical-cell ');
+    }
+}
+
+class SetPieceRequest {
+
+    constructor( board ) {
+        this.board = board;
+
+        this.side = null;
+        this.piece = null;
+        this.cell = null;
+        
+        const self = this;
+
+        for (let side in Chessboard.side) {
+            Object.defineProperty( this, Chessboard.side[ side ], {
+                get() { 
+                    self.side = Chessboard.side[ side ];
+                    return self._isValid ? self.board.setPiece( self.cell, self.piece, self.side ) : self;
+                },
+            });
+        }
+
+        for (let piece in Chessboard.piece) {
+            Object.defineProperty( this, Chessboard.piece[ piece ], {
+                get() { 
+                    self.piece = Chessboard.piece[ piece ];
+                    return self._isValid ? self.board.setPiece( self.cell, self.piece, self.side ) : self;
+                },
+            });
+        }
+
+        for (let c = 0; c < 8; c++) {
+            for (let n = 0; n < 8; n++) {
+                const cell = String.fromCharCode( 0x61 + c ) + (n + 1);
+                Object.defineProperty( this, cell, {
+                    get() { 
+                        self.cell = cell;
+                        return self._isValid ? self.board.setPiece( self.cell, self.piece, self.side ) : self;
+                    },
+                });
+            }
+        }
+    }
+
+    get to() { return this; }
+    get on() { return this; }
+
+    get _isValid() {
+        return this.cell && this.side && this.piece;
     }
 }

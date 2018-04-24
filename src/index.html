@@ -30,12 +30,8 @@
                     .setPiece( 'd5', p.pawn, s.white )
                     .setPiece( 'c6', p.pawn, s.white );
 
-                container.boards[1]
-                    .setPiece( '', p.queen, s.white );
-
-                    
                 // example: fill the board and clear one white rook out
-                //container.boards[0].fill().clearPiece( 'a1' );
+                // container.boards[0].fill().clearPiece( 'a1' );
 
                 // example: set task pieces
                 /*
@@ -50,6 +46,13 @@
                     .setPiece( 'g8', p.king, s.black )
                     .setPiece( 'f7', p.pawn, s.black )
                     .setPiece( 'g6', p.pawn, s.black )
+                */
+
+                // alternative syntax:
+                /*
+                container.boards[1]
+                    .set.white.queen.to.f6
+                    .set.black.king.to.c8;
                 */
             });
         </script>
