@@ -18,23 +18,50 @@
 */
 class Chessboards {
 
+    /**
+     * @constructor Constructor with 1 or 3 arguments
+     * @param {string} selector 
+     * @param {number} [columns]
+     * @param {number} [rows]
+     */
     constructor( selector, columns, rows ) {
 
+        /** @type {Chessboard[]} */
         this._boards = [];
+        this._app = $(selector);
 
-        const app = $(selector).addClass('main-container');
-        for (let row = 0; row < rows; row++) {
-            const rowHtml = $('<div>').addClass('main-container-row');
-            app.append( rowHtml );
-
-            for (let col = 0; col < columns; col++) {
-                this._boards.push( new Chessboard( `board-${row}-${col}`, rowHtml ) );
+        if (columns && rows) {
+            this._app.addClass('main-container');
+            for (let row = 0; row < rows; row++) {
+                const rowHtml = $('<div>').addClass('main-container-row');
+                this._app.append( rowHtml );
+    
+                for (let col = 0; col < columns; col++) {
+                    this._boards.push( new Chessboard( `board-${row}-${col}`, rowHtml ) );
+                }
             }
+        }
+        else {
+            this._app.addClass('main-container-long');
         }
     }
 
+    /**
+     * @description returns the list of boards
+     * @returns {Chessboard[]} the list of boards
+     */
     get boards() {
         return this._boards;
+    }
+
+    /**
+     * @description adds a new board
+     * @returns {Chessboard} newly created board
+     */
+    add() {
+        const board = new Chessboard( `board-${this._boards.length}`, this._app );
+        this._boards.push( board );
+        return board;
     }
 }
 
@@ -63,13 +90,19 @@ class Chessboards {
 */
 class Chessboard {
 
-    constructor( id, parent ) {
+    /**
+     * @constructor
+     * @param {string} id 
+     * @param {*} $parent jQuery container
+     */
+    constructor( id, $parent ) {
 
         this.id = id;
 
-        const container = $( '<div>' ).addClass( 'board-container' );
-        parent.append( container );
+        this._container = $( '<div>' ).addClass( 'board-container' );
+        $parent.append( this._container );
 
+        // frame with labels
         const hsideTop = $( '<div>' ).addClass( 'h-side' );
         const hsideBottom = $( '<div> ').addClass( 'h-side' );
         for (let i = 0; i < 8; i++) {
@@ -84,6 +117,7 @@ class Chessboard {
             vsideRight.append( this._createVSideCell( i ) );
         }
 
+        // cells
         const board = $( `<div id="${id}"> `).addClass( 'board' );
         for (let row = 0; row < 8; row++) {
             for (let col = 0; col < 8; col++) {
@@ -96,17 +130,19 @@ class Chessboard {
             }
         }
 
+        // putting all stuff together
         const rowBoard = $( '<div>' ).addClass( 'rowBoard' );
 
         rowBoard.append( vsideLeft );
         rowBoard.append( board );
         rowBoard.append( vsideRight );
 
-        container.append( hsideTop );
-        container.append( rowBoard );
-        container.append( hsideBottom );
+        this._container.append( hsideTop );
+        this._container.append( rowBoard );
+        this._container.append( hsideBottom );
     }
 
+    /** @description list of pieces */
     static get piece() {
         return {
             pawn: 'pawn',
@@ -118,6 +154,7 @@ class Chessboard {
         };
     }
 
+    /** @description list of sides */
     static get side() {
         return {
             white: 'white',
@@ -125,10 +162,10 @@ class Chessboard {
         };
     }
 
-    get set() { return new SetPieceRequest( this ); }
-    get put() { return new SetPieceRequest( this ); }
-    get place() { return new SetPieceRequest( this ); }
-
+    /**
+     * @description clears a piece from the cell if any
+     * @param {string} cell 
+     */
     clearPiece( cell ) {
         if (!cell) {
             console.warn( 'no cell ID' ); return this;
@@ -152,6 +189,12 @@ class Chessboard {
         return this;
     }
 
+    /**
+     * @description set the piece to the cell
+     * @param {string} cell 
+     * @param {string} piece 
+     * @param {string} side 
+     */
     setPiece( cell, piece, side ) {
         if (!cell) {
             console.warn( 'no cell ID' ); return this;
@@ -170,6 +213,7 @@ class Chessboard {
         return this;
     }
 
+    /** @description fill the board with initial setup */
     fill() {
         const p = Chessboard.piece;
         const s = Chessboard.side;
@@ -200,6 +244,7 @@ class Chessboard {
         return this;
     }
 
+    /** @description clears the board */
     clear() {
         for (let col = 0; col < 8; col++) {
             for (let row = 0; row < 8; row++) {
@@ -210,6 +255,15 @@ class Chessboard {
         return this;
     }
 
+    // properties that serve for making a chain of properties when setting a piece to a cell
+    
+    /** @returns {SetPieceRequest} */
+    get set() { return new SetPieceRequest( this ); }
+    /** @returns {SetPieceRequest} */
+    get put() { return new SetPieceRequest( this ); }
+    /** @returns {SetPieceRequest} */
+    get place() { return new SetPieceRequest( this ); }
+
     _createHSideCell( cell ) {
         return $( `<div>${String.fromCharCode( 0x61 + cell )}</div>` ).addClass( 'horizontal-cell' );
     }
@@ -219,8 +273,15 @@ class Chessboard {
     }
 }
 
+/**
+ * @description enables setting pieces in a way like "board.set.white.king.to.e1"
+ */
 class SetPieceRequest {
 
+    /**
+     * @constructor
+     * @param {Chessboard} board 
+     */
     constructor( board ) {
         this.board = board;
 
@@ -230,6 +291,7 @@ class SetPieceRequest {
         
         const self = this;
 
+        // enables sides in the chain
         for (let side in Chessboard.side) {
             Object.defineProperty( this, Chessboard.side[ side ], {
                 get() { 
@@ -239,6 +301,7 @@ class SetPieceRequest {
             });
         }
 
+        // enables pieces in the chain
         for (let piece in Chessboard.piece) {
             Object.defineProperty( this, Chessboard.piece[ piece ], {
                 get() { 
@@ -248,6 +311,7 @@ class SetPieceRequest {
             });
         }
 
+        // enables cell ids in the chain
         for (let c = 0; c < 8; c++) {
             for (let n = 0; n < 8; n++) {
                 const cell = String.fromCharCode( 0x61 + c ) + (n + 1);
@@ -261,7 +325,16 @@ class SetPieceRequest {
         }
     }
 
+    /** 
+     * @description enables "to" in the request chain
+     * @returns {SetPieceRequest}
+     */
     get to() { return this; }
+
+    /** 
+     * @description enables "on" in the request chain
+     * @returns {SetPieceRequest}
+     */
     get on() { return this; }
 
     get _isValid() {

@@ -1,12 +1,12 @@
 :root {
-    --cell-size: 34px;
+    --cell-size: 54px;
     --board-size: calc(var(--cell-size) * 8);
     --frame-size: 1em;
 }
 
 body {
-	background-color: #fff;
-	font: bold 14pt Calibri, Arial, sans-serif;
+	background-color: rgb(73, 37, 13);
+	font: bold 16pt Calibri, Arial, sans-serif;
     color: #444;
 	text-align: center;
     padding: 0;
@@ -18,16 +18,20 @@ body {
     flex-direction: column;
 }
 
+.main-container-long {
+    display: flex;
+    flex-direction: row;
+}
+
 .main-container-row {
 	display: flex;
     flex-wrap: nowrap;
     justify-content: space-around;
-
-    padding: 1em;
 }
 
 .board-container {
-    background-color: #999;
+    background-color: rgb(143, 166, 180);
+    margin: 1em;
 }
 
 .rowBoard {
@@ -63,7 +67,7 @@ body {
     width: var(--board-size);
     height: var(--board-size);
 
-    font-size: 18pt;
+    font-size: calc(var(--cell-size) * 0.8);
 }
 
 .cell {
@@ -73,17 +77,17 @@ body {
 }
 
 .cell.even {
-    background-color: #ccc;
+    background-color: rgb(177, 144, 133);
 }
 
 .cell.odd {
-    background-color: #fff;
+    background-color: rgb(236, 236, 236);
 }
 
 .white {
     color: #fff;
     text-shadow: 2px 0px #000, -2px 0px #000, 0px 2px #000, 0px -2px #000;
-    font-size: 16pt;
+    font-size: calc(var(--cell-size) * 0.75);
 }
 
 .black {
