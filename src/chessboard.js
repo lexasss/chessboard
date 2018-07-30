@@ -18,50 +18,23 @@
 */
 class Chessboards {
 
-    /**
-     * @constructor Constructor with 1 or 3 arguments
-     * @param {string} selector 
-     * @param {number} [columns]
-     * @param {number} [rows]
-     */
     constructor( selector, columns, rows ) {
 
-        /** @type {Chessboard[]} */
         this._boards = [];
-        this._app = $(selector);
 
-        if (columns && rows) {
-            this._app.addClass('main-container');
-            for (let row = 0; row < rows; row++) {
-                const rowHtml = $('<div>').addClass('main-container-row');
-                this._app.append( rowHtml );
-    
-                for (let col = 0; col < columns; col++) {
-                    this._boards.push( new Chessboard( `board-${row}-${col}`, rowHtml ) );
-                }
+        const app = $(selector).addClass('main-container');
+        for (let row = 0; row < rows; row++) {
+            const rowHtml = $('<div>').addClass('main-container-row');
+            app.append( rowHtml );
+
+            for (let col = 0; col < columns; col++) {
+                this._boards.push( new Chessboard( `board-${row}-${col}`, rowHtml ) );
             }
         }
-        else {
-            this._app.addClass('main-container-long');
-        }
     }
 
-    /**
-     * @description returns the list of boards
-     * @returns {Chessboard[]} the list of boards
-     */
     get boards() {
         return this._boards;
-    }
-
-    /**
-     * @description adds a new board
-     * @returns {Chessboard} newly created board
-     */
-    add() {
-        const board = new Chessboard( `board-${this._boards.length}`, this._app );
-        this._boards.push( board );
-        return board;
     }
 }
 
@@ -90,19 +63,17 @@ class Chessboards {
 */
 class Chessboard {
 
-    /**
-     * @constructor
-     * @param {string} id 
-     * @param {*} $parent jQuery container
-     */
-    constructor( id, $parent ) {
+    constructor( id, parent ) {
 
         this.id = id;
 
-        this._container = $( '<div>' ).addClass( 'board-container' );
-        $parent.append( this._container );
+        // DOM creation
 
-        // frame with labels
+        // Board
+        const container = $( '<div>' ).addClass( 'board-container' );
+        parent.append( container );
+
+        // Sides
         const hsideTop = $( '<div>' ).addClass( 'h-side' );
         const hsideBottom = $( '<div> ').addClass( 'h-side' );
         for (let i = 0; i < 8; i++) {
@@ -117,32 +88,83 @@ class Chessboard {
             vsideRight.append( this._createVSideCell( i ) );
         }
 
-        // cells
-        const board = $( `<div id="${id}"> `).addClass( 'board' );
+        // Cells
+        this.cells = [];
+
+        this.board = $( `<div id="${id}"> `).addClass( 'board' );
         for (let row = 0; row < 8; row++) {
             for (let col = 0; col < 8; col++) {
-                board.append( $( '<i>' )
+                const location = String.fromCharCode( 0x61 + col ) + (8 - row);
+                const cell = $( '<div>' )
                     .addClass( 'cell' )
-                    .addClass( 'fas' )
-                    .addClass( String.fromCharCode( 0x61 + col ) + (8 - row) )
+                    .addClass( location )
                     .addClass( (row + col) % 2 ? 'even' : 'odd' )
-                );
+                    .append( ' ' );
+                cell.get(0).dataset.location = location;
+                this.board.append( cell );
+
+                this.cells.push( cell );
             }
         }
 
-        // putting all stuff together
+        // Moving piece
+        this.clickedCell = null;
+        this.movingPiece = $( '<div>' )
+            .addClass( 'cell' )
+            .addClass( 'hidden' )
+            .addClass( 'moving' );
+        this.board.append( this.movingPiece );
+
+        // put all together into container
         const rowBoard = $( '<div>' ).addClass( 'rowBoard' );
 
         rowBoard.append( vsideLeft );
-        rowBoard.append( board );
+        rowBoard.append( this.board );
         rowBoard.append( vsideRight );
 
-        this._container.append( hsideTop );
-        this._container.append( rowBoard );
-        this._container.append( hsideBottom );
+        container.append( hsideTop );
+        container.append( rowBoard );
+        container.append( hsideBottom );
+
+        // EVENT HANDLERS
+
+        this.board.mousemove( e => {
+            if (e.buttons === 1 && this.clickedCell) {
+                if (this.movingPiece.hasClass( 'hidden' )) {
+                    const dataset = this.clickedCell.get(0).dataset;
+                    this.movingPiece.get(0).dataset.piece = dataset.piece;
+                    this.movingPiece.get(0).dataset.side = dataset.side;
+                    this.movingPiece.removeClass( 'hidden' );
+
+                    delete dataset.piece;
+                    delete dataset.side;
+                }
+    
+                this.movingPiece.get(0).style.left = (e.clientX - 16) + 'px';
+                this.movingPiece.get(0).style.top = (e.clientY - 12) + 'px';
+            }
+        });
+
+        this.board.mouseup( e => {
+            if (this.clickedCell && !this.movingPiece.hasClass( 'hidden' )) {
+                this.clickedCell.off( 'mousedown' );
+
+                const dataset = this.movingPiece.get(0).dataset;
+
+                const newCell = e.target.dataset.piece ? this.clickedCell : $( e.target );
+                if (newCell.hasClass( 'cell' )) {
+                    this.setPiece( newCell.get(0).dataset.location, dataset.piece, dataset.side );
+                }
+
+                this.movingPiece.addClass( 'hidden' ); // .text( '' )
+                delete dataset.piece;   
+                delete dataset.side;
+            }
+
+            this.clickedCell = null;
+        });
     }
 
-    /** @description list of pieces */
     static get piece() {
         return {
             pawn: 'pawn',
@@ -154,7 +176,6 @@ class Chessboard {
         };
     }
 
-    /** @description list of sides */
     static get side() {
         return {
             white: 'white',
@@ -162,10 +183,48 @@ class Chessboard {
         };
     }
 
-    /**
-     * @description clears a piece from the cell if any
-     * @param {string} cell 
-     */
+    static get pieceLetter() {
+        return {
+            black: {
+                pawn: 'P',
+                knight: 'N',
+                bishop: 'B',
+                rook: 'R',
+                queen: 'Q',
+                king: 'K',
+            },
+            white: {
+                pawn: 'p',
+                knight: 'n',
+                bishop: 'b',
+                rook: 'r',
+                queen: 'q',
+                king: 'k',
+            },
+        };
+    }
+
+    static get letterPiece() {
+        return {
+            P: { piece: 'pawn', side: 'black' },
+            N: { piece: 'knight', side: 'black' },
+            B: { piece: 'bishop', side: 'black' },
+            R: { piece: 'rook', side: 'black' },
+            Q: { piece: 'queen', side: 'black' },
+            K: { piece: 'king', side: 'black' },
+            p: { piece: 'pawn', side: 'white' },
+            n: { piece: 'knight', side: 'white' },
+            b: { piece: 'bishop', side: 'white' },
+            r: { piece: 'rook', side: 'white' },
+            q: { piece: 'queen', side: 'white' },
+            k: { piece: 'king', side: 'white' },
+        };
+    }
+
+    get set() { return new SetPieceRequest( this ); }
+    get put() { return new SetPieceRequest( this ); }
+    get place() { return new SetPieceRequest( this ); }
+
     clearPiece( cell ) {
         if (!cell) {
             console.warn( 'no cell ID' ); return this;
@@ -179,6 +238,11 @@ class Chessboard {
         const pieces = Chessboard.piece;
         const side = Chessboard.side;
 
+        //el.empty();
+        const dataset = el.get(0).dataset;
+        delete dataset.piece;
+        delete dataset.side;
+
         for (let id in pieces) {
             el.removeClass( `fa-chess-${pieces[id]}` );
         }
@@ -186,15 +250,11 @@ class Chessboard {
             el.removeClass( side[id] );
         }
 
+        el.off( 'mousedown' );
+
         return this;
     }
 
-    /**
-     * @description set the piece to the cell
-     * @param {string} cell 
-     * @param {string} piece 
-     * @param {string} side 
-     */
     setPiece( cell, piece, side ) {
         if (!cell) {
             console.warn( 'no cell ID' ); return this;
@@ -206,14 +266,23 @@ class Chessboard {
         if (!el) {
             return this;
         }
-        
-        el.addClass( side )
-            .addClass( `fa-chess-${piece}` );
+
+        const dataset = el.get(0).dataset;
+
+        dataset.piece = piece;
+        dataset.side = side;
+
+        el.mousedown( () => {
+            this.clickedCell = el;
+        });
+
+        el.dblclick( () => {
+            this.clearPiece( dataset.location );
+        });
 
         return this;
     }
 
-    /** @description fill the board with initial setup */
     fill() {
         const p = Chessboard.piece;
         const s = Chessboard.side;
@@ -244,7 +313,6 @@ class Chessboard {
         return this;
     }
 
-    /** @description clears the board */
     clear() {
         for (let col = 0; col < 8; col++) {
             for (let row = 0; row < 8; row++) {
@@ -255,14 +323,62 @@ class Chessboard {
         return this;
     }
 
-    // properties that serve for making a chain of properties when setting a piece to a cell
-    
-    /** @returns {SetPieceRequest} */
-    get set() { return new SetPieceRequest( this ); }
-    /** @returns {SetPieceRequest} */
-    get put() { return new SetPieceRequest( this ); }
-    /** @returns {SetPieceRequest} */
-    get place() { return new SetPieceRequest( this ); }
+    getPiece( cell ) {
+        const el = $( `#${this.id} .${cell}` );
+        if (!el) {
+            return null;
+        }
+
+        const data = el.get(0).dataset;
+        return {
+            piece: data.piece,
+            side: data.side,
+        };
+    }
+
+    move( from, to ) {
+        const {piece, side} = this.getPiece( from );
+
+        this.setPiece( to, piece, side );
+        this.clearPiece( from );
+
+        return this;
+    }
+
+    toString() {
+        return this.cells.reduce( (acc, cell) => {
+            const { piece, side } = cell.get(0).dataset;
+            if (piece) {
+                return acc + Chessboard.pieceLetter[ side ][ piece ];
+            }
+            else {
+                return acc + cell.text();
+            }
+        }, '' );
+    }
+
+    fromString( str ) {
+        if ( str.length != 64) {
+            return false;
+        }
+
+        this.clear();
+
+        let index = 0;
+        for (let row = 0; row < 8; row++) {
+            for (let col = 0; col < 8; col++) {
+                const value = str[ index ];
+
+                if (value > 'A' && value < 'z') {
+                    const location = this.cells[ index ].get(0).dataset.location;
+                    const { piece, side } = Chessboard.letterPiece[ value ];
+                    this.setPiece( location, piece, side );
+                }
+
+                index++;
+            }
+        }
+    }
 
     _createHSideCell( cell ) {
         return $( `<div>${String.fromCharCode( 0x61 + cell )}</div>` ).addClass( 'horizontal-cell' );
@@ -273,15 +389,8 @@ class Chessboard {
     }
 }
 
-/**
- * @description enables setting pieces in a way like "board.set.white.king.to.e1"
- */
 class SetPieceRequest {
 
-    /**
-     * @constructor
-     * @param {Chessboard} board 
-     */
     constructor( board ) {
         this.board = board;
 
@@ -291,7 +400,6 @@ class SetPieceRequest {
         
         const self = this;
 
-        // enables sides in the chain
         for (let side in Chessboard.side) {
             Object.defineProperty( this, Chessboard.side[ side ], {
                 get() { 
@@ -301,7 +409,6 @@ class SetPieceRequest {
             });
         }
 
-        // enables pieces in the chain
         for (let piece in Chessboard.piece) {
             Object.defineProperty( this, Chessboard.piece[ piece ], {
                 get() { 
@@ -311,7 +418,6 @@ class SetPieceRequest {
             });
         }
 
-        // enables cell ids in the chain
         for (let c = 0; c < 8; c++) {
             for (let n = 0; n < 8; n++) {
                 const cell = String.fromCharCode( 0x61 + c ) + (n + 1);
@@ -325,16 +431,7 @@ class SetPieceRequest {
         }
     }
 
-    /** 
-     * @description enables "to" in the request chain
-     * @returns {SetPieceRequest}
-     */
     get to() { return this; }
-
-    /** 
-     * @description enables "on" in the request chain
-     * @returns {SetPieceRequest}
-     */
     get on() { return this; }
 
     get _isValid() {

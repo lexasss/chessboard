@@ -1,12 +1,12 @@
 :root {
-    --cell-size: 54px;
+    --cell-size: 34px;
     --board-size: calc(var(--cell-size) * 8);
     --frame-size: 1em;
 }
 
 body {
-	background-color: rgb(73, 37, 13);
-	font: bold 16pt Calibri, Arial, sans-serif;
+	background-color: #fff;
+	font: bold 14pt Calibri, Arial, sans-serif;
     color: #444;
 	text-align: center;
     padding: 0;
@@ -18,20 +18,16 @@ body {
     flex-direction: column;
 }
 
-.main-container-long {
-    display: flex;
-    flex-direction: row;
-}
-
 .main-container-row {
 	display: flex;
     flex-wrap: nowrap;
     justify-content: space-around;
+
+    padding: 1em;
 }
 
 .board-container {
-    background-color: rgb(143, 166, 180);
-    margin: 1em;
+    background-color: #999;
 }
 
 .rowBoard {
@@ -67,7 +63,8 @@ body {
     width: var(--board-size);
     height: var(--board-size);
 
-    font-size: calc(var(--cell-size) * 0.8);
+    font-size: 18pt;
+    user-select: none;
 }
 
 .cell {
@@ -76,20 +73,64 @@ body {
     line-height: var(--cell-size);
 }
 
+.cell[data-piece] {
+    cursor: pointer;
+    background-size: calc(6 * var(--cell-size)) calc(2 * var(--cell-size));
+    background-image: url(pieces.png);
+}
+
+.cell[data-piece='queen'][data-side='white'] {
+    background-position: 0 0;
+}
+.cell[data-piece='king'][data-side='black'] {
+    background-position: calc(-1 * var(--cell-size)) 0;
+}
+.cell[data-piece='rook'][data-side='black'] {
+    background-position: calc(-2 * var(--cell-size)) 0;
+}
+.cell[data-piece='bishop'][data-side='black'] {
+    background-position: calc(-3 * var(--cell-size)) 0;
+}
+.cell[data-piece='knight'][data-side='black'] {
+    background-position: calc(-4 * var(--cell-size)) 0;
+}
+.cell[data-piece='pawn'][data-side='black'] {
+    background-position: calc(-5 * var(--cell-size)) 0;
+}
+.cell[data-piece='queen'][data-side='white'] {
+    background-position: 0 calc(-1 * var(--cell-size));
+}
+.cell[data-piece='king'][data-side='white'] {
+    background-position: calc(-1 * var(--cell-size)) calc(-1 * var(--cell-size));
+}
+.cell[data-piece='rook'][data-side='white'] {
+    background-position: calc(-2 * var(--cell-size)) calc(-1 * var(--cell-size));
+}
+.cell[data-piece='bishop'][data-side='white'] {
+    background-position: calc(-3 * var(--cell-size)) calc(-1 * var(--cell-size));
+}
+.cell[data-piece='knight'][data-side='white'] {
+    background-position: calc(-4 * var(--cell-size)) calc(-1 * var(--cell-size));
+}
+.cell[data-piece='pawn'][data-side='white'] {
+    background-position: calc(-5 * var(--cell-size)) calc(-1 * var(--cell-size));
+}
+
 .cell.even {
-    background-color: rgb(177, 144, 133);
+    background-color: #ccc;
 }
 
 .cell.odd {
-    background-color: rgb(236, 236, 236);
+    background-color: #fff;
 }
 
-.white {
-    color: #fff;
-    text-shadow: 2px 0px #000, -2px 0px #000, 0px 2px #000, 0px -2px #000;
-    font-size: calc(var(--cell-size) * 0.75);
+.cell.hidden {
+    display: none;
 }
 
-.black {
-    color: #222;
+.moving {
+    position: fixed;
+    width: var(--cell-size);
+    height: var(--cell-size);
+    pointer-events: none;
 }

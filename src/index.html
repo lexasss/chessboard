@@ -4,7 +4,6 @@
         <title>Chessboard</title>
         <meta charset="UTF-8">
 
-        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.10/css/all.css" integrity="sha384-+d0P83n9kaQMCwj8F4RJB66tzIwOKmrdb46+porD/OvrJ+37WqIM7UoBtwHO6Nlg" crossorigin="anonymous">
         <link rel="stylesheet" href="chessboard.css" type="text/css">
 
     	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -13,39 +12,56 @@
         	$(() => {
                 const boards = new Chessboards( '#app' );
 
-                boards.add()
-                    .set.white.queen.to.c4
-                    .set.black.queen.to.d8
-                    .set.black.knight.to.g3
-                    .set.white.bishop.to.e5
-                    .set.black.king.to.f8
-                    .set.white.king.to.e1
-                    .set.black.pawn.to.f7
-                    .set.black.pawn.to.g7
-                    .set.black.pawn.to.g6
-                    .set.black.pawn.to.b5
-                    .set.white.pawn.to.d5
-                    .set.white.pawn.to.c6;
-                    
-                    boards.add()
-                    .set.white.queen.to.f6
-                    .set.black.king.to.c8
-                    .set.black.knight.to.g3
-                    .set.white.king.to.d1
-                    .set.white.pawn.to.d3
-                    .set.white.pawn.to.a5
-                    .set.black.pawn.to.d7
-                    .set.black.rook.to.f5;
+                const p = Chessboard.piece;
+                const s = Chessboard.side;
+
+                container.boards[0]
+                    .setPiece( 'c4', p.queen, s.white )
+                    .setPiece( 'd8', p.queen, s.black )
+                    .setPiece( 'g3', p.knight, s.black )
+                    .setPiece( 'e5', p.bishop, s.white )
+                    .setPiece( 'f8', p.king, s.black )
+                    .setPiece( 'e1', p.king, s.white )
+                    .setPiece( 'f7', p.pawn, s.black )
+                    .setPiece( 'g7', p.pawn, s.black )
+                    .setPiece( 'g6', p.pawn, s.black )
+                    .setPiece( 'b5', p.pawn, s.black )
+                    .setPiece( 'd5', p.pawn, s.white )
+                    .setPiece( 'c6', p.pawn, s.white );
 
                 // example: fill the board and clear one white rook out
-                // boards.add().fill().clearPiece( 'a1' );
+                // container.boards[0].fill().clearPiece( 'a1' );
 
-                // custom setup syntax:
-                /*
-                boards.add()
-                    .set.white.queen.to.f6
-                    .set.black.king.to.c8;
-                */
+                // example: set task pieces
+                
+                container.boards[1]
+                    .setPiece( 'h1', p.rook, s.white )
+                    .setPiece( 'f2', p.pawn, s.white )
+                    .setPiece( 'g2', p.king, s.white )
+                    .setPiece( 'f6', p.bishop, s.white )
+                    .setPiece( 'f8', p.rook, s.black )
+                    .setPiece( 'g8', p.king, s.black )
+                    .setPiece( 'f7', p.pawn, s.black )
+                    .setPiece( 'g6', p.pawn, s.black )
+
+                // alternative syntax:
+                container.boards[2]
+                    .set.black.king.to.a3
+                    .set.black.queen.to.b4
+                    .set.black.rook.to.c5
+                    .set.black.bishop.to.d6
+                    .set.black.knight.to.e7
+                    .set.black.pawn.to.f8
+                    .set.white.king.to.c1
+                    .set.white.queen.to.d2
+                    .set.white.rook.to.e3
+                    .set.white.knight.to.f4
+                    .set.white.bishop.to.g5
+                    .set.white.pawn.to.h6
+
+                container.boards[3].fill();
+
+                container.boards[4].fromString( container.boards[0].toString() );
             });
         </script>
     </head>
