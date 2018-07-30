@@ -1,3 +1,28 @@
+@font-face {
+    font-family: Kingdom;
+    src: url(fonts/kingdom.ttf);
+}
+
+@font-face {
+    font-family: Cases;
+    src: url(fonts/cases.ttf);
+}
+
+@font-face {
+    font-family: Leipzig;
+    src: url(fonts/leipzig.ttf);
+}
+
+@font-face {
+    font-family: Maya;
+    src: url(fonts/maya.ttf);
+}
+
+@font-face {
+    font-family: Merida;
+    src: url(fonts/merida.ttf);
+}
+
 :root {
     --cell-size: 34px;
     --board-size: calc(var(--cell-size) * 8);
@@ -64,12 +89,17 @@ body {
     height: var(--board-size);
 
     font-size: 18pt;
+    user-select: none;
 }
 
 .cell {
     width: var(--cell-size);
     height: var(--cell-size);
     line-height: var(--cell-size);
+}
+
+.cell[data-piece] {
+    cursor: pointer;
 }
 
 .cell.even {
@@ -88,4 +118,27 @@ body {
 
 .black {
     color: #222;
+}
+
+.letterPieceAll {
+    font-family: Leipzig, Consolas, monospace;
+    font-size: var(--cell-size);
+    background-color: #fff !important;
+    color: #666;
+}
+
+.letterPiece {
+    font-family: Leipzig, Consolas, monospace;
+    font-size: var(--cell-size);
+    color: #222;
+}
+
+.hidden {
+    display: none;
+}
+
+.moving {
+    position: absolute;
+    pointer-events: none;
+    background: rgba(0, 0, 0, 0) !important;
 }

@@ -34,10 +34,8 @@
                 // container.boards[0].fill().clearPiece( 'a1' );
 
                 // example: set task pieces
-                /*
-                const p = Chessboard.piece;
-                const s = Chessboard.side;
-                container.boards[0]
+                
+                container.boards[1]
                     .setPiece( 'h1', p.rook, s.white )
                     .setPiece( 'f2', p.pawn, s.white )
                     .setPiece( 'g2', p.king, s.white )
@@ -46,14 +44,23 @@
                     .setPiece( 'g8', p.king, s.black )
                     .setPiece( 'f7', p.pawn, s.black )
                     .setPiece( 'g6', p.pawn, s.black )
-                */
 
                 // alternative syntax:
-                /*
-                container.boards[1]
-                    .set.white.queen.to.f6
-                    .set.black.king.to.c8;
-                */
+                container.boards[2]
+                    .set.black.king.to.a3
+                    .set.black.queen.to.b4
+                    .set.black.rook.to.c5
+                    .set.black.bishop.to.d6
+                    .set.black.knight.to.e7
+                    .set.black.pawn.to.f8
+                    .set.white.king.to.c1
+                    .set.white.queen.to.d2
+                    .set.white.rook.to.e3
+                    .set.white.knight.to.f4
+                    .set.white.bishop.to.g5
+                    .set.white.pawn.to.h6
+
+                container.boards[3].fill();
             });
         </script>
     </head>

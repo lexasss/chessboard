@@ -63,13 +63,39 @@ class Chessboards {
 */
 class Chessboard {
 
+    static get BOARD_PARAMS_ID() {
+        return 'letterPieceAll';
+    }
+
     constructor( id, parent ) {
 
         this.id = id;
 
+        const BOARD_PARAMS = {
+            letterPieceAll: {
+                tag: '<div>',
+                cls : 'letterPieceAll',
+                content: '',
+            },
+            letterPiece: {
+                tag: '<div>',
+                cls : 'letterPiece',
+                content: '',
+            },
+            fontAwesome: {
+                tag: '<i>',
+                cls : '',
+                content: '',
+            }
+        };
+
+        // DOM creation
+
+        // Board
         const container = $( '<div>' ).addClass( 'board-container' );
         parent.append( container );
 
+        // Sides
         const hsideTop = $( '<div>' ).addClass( 'h-side' );
         const hsideBottom = $( '<div> ').addClass( 'h-side' );
         for (let i = 0; i < 8; i++) {
@@ -84,27 +110,94 @@ class Chessboard {
             vsideRight.append( this._createVSideCell( i ) );
         }
 
-        const board = $( `<div id="${id}"> `).addClass( 'board' );
+        // Cells
+        const params = BOARD_PARAMS[ Chessboard.BOARD_PARAMS_ID ];
+
+        this.board = $( `<div id="${id}"> `).addClass( 'board' );
         for (let row = 0; row < 8; row++) {
             for (let col = 0; col < 8; col++) {
-                board.append( $( '<i>' )
+                if (Chessboard.BOARD_PARAMS_ID === 'letterPieceAll') {
+                    params.content = (row + col) % 2 ? '+' : ' ';
+                }
+
+                const location = String.fromCharCode( 0x61 + col ) + (8 - row);
+                const cell = $( params.tag )
                     .addClass( 'cell' )
                     .addClass( 'fas' )
-                    .addClass( String.fromCharCode( 0x61 + col ) + (8 - row) )
+                    .addClass( location )
                     .addClass( (row + col) % 2 ? 'even' : 'odd' )
-                );
+                    .addClass( params.cls )
+                    .append( params.content );
+                cell.get(0).dataset.location = location;
+                this.board.append( cell );
             }
         }
 
+        // Moving piece
+        this.clickedCell = null;
+        this.movingPiece = $( params.tag )
+            .addClass( 'cell' )
+            .addClass( 'fas' )
+            .addClass( 'hidden' )
+            .addClass( 'moving' )
+            .addClass( params.cls );
+        this.board.append( this.movingPiece );
+
+        // put all together into container
         const rowBoard = $( '<div>' ).addClass( 'rowBoard' );
 
         rowBoard.append( vsideLeft );
-        rowBoard.append( board );
+        rowBoard.append( this.board );
         rowBoard.append( vsideRight );
 
         container.append( hsideTop );
         container.append( rowBoard );
         container.append( hsideBottom );
+
+        // Event handlers
+        this.board.mousemove( e => {
+            if (e.buttons === 1 && this.clickedCell) {
+                if (!this.movingPiece.text()) {
+                    const cell = this.clickedCell;
+                    this.movingPiece.get(0).dataset.piece = cell.get(0).dataset.piece;
+                    this.movingPiece.get(0).dataset.side = cell.get(0).dataset.side;
+                    this.movingPiece.text( cell.text().toLowerCase() );
+                    this.movingPiece.removeClass( 'hidden' );
+
+                    if (cell.text() < 'a') {  // dark cell contains A-Z, light cell contains a-z
+                        cell.text( '+' );
+                    }
+                    else {
+                        cell.text( ' ' );
+                    }
+        
+                    delete cell.get(0).dataset.piece;
+                    delete cell.get(0).dataset.side;
+                }
+    
+                this.movingPiece.get(0).style.left = (e.clientX - 16) + 'px';
+                this.movingPiece.get(0).style.top = (e.clientY - 12) + 'px';
+            }
+        });
+
+        this.board.mouseup( e => {
+            if (this.clickedCell && this.movingPiece.text()) {
+                this.clickedCell.off( 'mousedown' );
+
+                const dataset = this.movingPiece.get(0).dataset;
+
+                const newCell = e.target.dataset.piece ? this.clickedCell : $( e.target );
+                if (newCell.hasClass( 'cell' )) {
+                    this.setPiece( newCell.get(0).dataset.location, dataset.piece, dataset.side );
+                }
+
+                this.movingPiece.text( '' ).addClass( 'hidden' );
+                delete dataset.piece;
+                delete dataset.side;
+            }
+
+            this.clickedCell = null;
+        });
     }
 
     static get piece() {
@@ -125,6 +218,27 @@ class Chessboard {
         };
     }
 
+    static get letterPiece() {
+        return {
+            black: {
+                pawn: 'o',
+                knight: 'm',
+                bishop: 'v',
+                rook: 't',
+                queen: 'w',
+                king: 'l',
+            },
+            white: {
+                pawn: 'p',
+                knight: 'n',
+                bishop: 'b',
+                rook: 'r',
+                queen: 'q',
+                king: 'k',
+            },
+        };
+    }
+
     get set() { return new SetPieceRequest( this ); }
     get put() { return new SetPieceRequest( this ); }
     get place() { return new SetPieceRequest( this ); }
@@ -142,12 +256,21 @@ class Chessboard {
         const pieces = Chessboard.piece;
         const side = Chessboard.side;
 
+        el.empty();
+
+        if (Chessboard.BOARD_PARAMS_ID === 'letterPieceAll') {
+            const letter = el.hasClass('even') ? '+' : ' ';
+            el.append( letter );
+        }
+
         for (let id in pieces) {
             el.removeClass( `fa-chess-${pieces[id]}` );
         }
         for (let id in side) {
             el.removeClass( side[id] );
         }
+
+        el.off( 'mousedown' );
 
         return this;
     }
@@ -163,9 +286,28 @@ class Chessboard {
         if (!el) {
             return this;
         }
-        
-        el.addClass( side )
-            .addClass( `fa-chess-${piece}` );
+
+        const dataset = el.get(0).dataset;
+
+        dataset.piece = piece;
+        dataset.side = side;
+
+        if (Chessboard.BOARD_PARAMS_ID.startsWith( 'letterPiece' )) {
+            el.empty();
+            let letter = Chessboard.letterPiece[ side ][ piece ];
+            if (el.hasClass('even') && Chessboard.BOARD_PARAMS_ID === 'letterPieceAll') {
+                letter = letter.toUpperCase();
+            }
+            el.append( letter );
+        }
+        else {
+            el.addClass( side )
+                .addClass( `fa-chess-${piece}` );
+        }
+
+        el.mousedown( () => {
+            this.clickedCell = el;
+        });
 
         return this;
     }
@@ -206,6 +348,28 @@ class Chessboard {
                 this.clearPiece( `${String.fromCharCode( 0x61 + col )}${row + 1}` );
             }
         }
+
+        return this;
+    }
+
+    getPiece( cell ) {
+        const el = $( `#${this.id} .${cell}` );
+        if (!el) {
+            return null;
+        }
+
+        const data = el.get(0).dataset;
+        return {
+            piece: data.piece,
+            side: data.side,
+        };
+    }
+
+    move( from, to ) {
+        const {piece, side} = this.getPiece( from );
+
+        this.setPiece( to, piece, side );
+        this.clearPiece( from );
 
         return this;
     }
