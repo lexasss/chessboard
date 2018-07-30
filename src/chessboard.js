@@ -63,31 +63,9 @@ class Chessboards {
 */
 class Chessboard {
 
-    static get BOARD_PARAMS_ID() {
-        return 'letterPieceAll';
-    }
-
     constructor( id, parent ) {
 
         this.id = id;
-
-        const BOARD_PARAMS = {
-            letterPieceAll: {
-                tag: '<div>',
-                cls : 'letterPieceAll',
-                content: '',
-            },
-            letterPiece: {
-                tag: '<div>',
-                cls : 'letterPiece',
-                content: '',
-            },
-            fontAwesome: {
-                tag: '<i>',
-                cls : '',
-                content: '',
-            }
-        };
 
         // DOM creation
 
@@ -111,36 +89,30 @@ class Chessboard {
         }
 
         // Cells
-        const params = BOARD_PARAMS[ Chessboard.BOARD_PARAMS_ID ];
+        this.cells = [];
 
         this.board = $( `<div id="${id}"> `).addClass( 'board' );
         for (let row = 0; row < 8; row++) {
             for (let col = 0; col < 8; col++) {
-                if (Chessboard.BOARD_PARAMS_ID === 'letterPieceAll') {
-                    params.content = (row + col) % 2 ? '+' : ' ';
-                }
-
                 const location = String.fromCharCode( 0x61 + col ) + (8 - row);
-                const cell = $( params.tag )
+                const cell = $( '<div>' )
                     .addClass( 'cell' )
-                    .addClass( 'fas' )
                     .addClass( location )
                     .addClass( (row + col) % 2 ? 'even' : 'odd' )
-                    .addClass( params.cls )
-                    .append( params.content );
+                    .append( ' ' );
                 cell.get(0).dataset.location = location;
                 this.board.append( cell );
+
+                this.cells.push( cell );
             }
         }
 
         // Moving piece
         this.clickedCell = null;
-        this.movingPiece = $( params.tag )
+        this.movingPiece = $( '<div>' )
             .addClass( 'cell' )
-            .addClass( 'fas' )
             .addClass( 'hidden' )
-            .addClass( 'moving' )
-            .addClass( params.cls );
+            .addClass( 'moving' );
         this.board.append( this.movingPiece );
 
         // put all together into container
@@ -154,25 +126,18 @@ class Chessboard {
         container.append( rowBoard );
         container.append( hsideBottom );
 
-        // Event handlers
+        // EVENT HANDLERS
+
         this.board.mousemove( e => {
             if (e.buttons === 1 && this.clickedCell) {
-                if (!this.movingPiece.text()) {
-                    const cell = this.clickedCell;
-                    this.movingPiece.get(0).dataset.piece = cell.get(0).dataset.piece;
-                    this.movingPiece.get(0).dataset.side = cell.get(0).dataset.side;
-                    this.movingPiece.text( cell.text().toLowerCase() );
+                if (this.movingPiece.hasClass( 'hidden' )) {
+                    const dataset = this.clickedCell.get(0).dataset;
+                    this.movingPiece.get(0).dataset.piece = dataset.piece;
+                    this.movingPiece.get(0).dataset.side = dataset.side;
                     this.movingPiece.removeClass( 'hidden' );
 
-                    if (cell.text() < 'a') {  // dark cell contains A-Z, light cell contains a-z
-                        cell.text( '+' );
-                    }
-                    else {
-                        cell.text( ' ' );
-                    }
-        
-                    delete cell.get(0).dataset.piece;
-                    delete cell.get(0).dataset.side;
+                    delete dataset.piece;
+                    delete dataset.side;
                 }
     
                 this.movingPiece.get(0).style.left = (e.clientX - 16) + 'px';
@@ -181,7 +146,7 @@ class Chessboard {
         });
 
         this.board.mouseup( e => {
-            if (this.clickedCell && this.movingPiece.text()) {
+            if (this.clickedCell && !this.movingPiece.hasClass( 'hidden' )) {
                 this.clickedCell.off( 'mousedown' );
 
                 const dataset = this.movingPiece.get(0).dataset;
@@ -191,8 +156,8 @@ class Chessboard {
                     this.setPiece( newCell.get(0).dataset.location, dataset.piece, dataset.side );
                 }
 
-                this.movingPiece.text( '' ).addClass( 'hidden' );
-                delete dataset.piece;
+                this.movingPiece.addClass( 'hidden' ); // .text( '' )
+                delete dataset.piece;   
                 delete dataset.side;
             }
 
@@ -218,15 +183,15 @@ class Chessboard {
         };
     }
 
-    static get letterPiece() {
+    static get pieceLetter() {
         return {
             black: {
-                pawn: 'o',
-                knight: 'm',
-                bishop: 'v',
-                rook: 't',
-                queen: 'w',
-                king: 'l',
+                pawn: 'P',
+                knight: 'N',
+                bishop: 'B',
+                rook: 'R',
+                queen: 'Q',
+                king: 'K',
             },
             white: {
                 pawn: 'p',
@@ -236,6 +201,23 @@ class Chessboard {
                 queen: 'q',
                 king: 'k',
             },
+        };
+    }
+
+    static get letterPiece() {
+        return {
+            P: { piece: 'pawn', side: 'black' },
+            N: { piece: 'knight', side: 'black' },
+            B: { piece: 'bishop', side: 'black' },
+            R: { piece: 'rook', side: 'black' },
+            Q: { piece: 'queen', side: 'black' },
+            K: { piece: 'king', side: 'black' },
+            p: { piece: 'pawn', side: 'white' },
+            n: { piece: 'knight', side: 'white' },
+            b: { piece: 'bishop', side: 'white' },
+            r: { piece: 'rook', side: 'white' },
+            q: { piece: 'queen', side: 'white' },
+            k: { piece: 'king', side: 'white' },
         };
     }
 
@@ -256,12 +238,10 @@ class Chessboard {
         const pieces = Chessboard.piece;
         const side = Chessboard.side;
 
-        el.empty();
-
-        if (Chessboard.BOARD_PARAMS_ID === 'letterPieceAll') {
-            const letter = el.hasClass('even') ? '+' : ' ';
-            el.append( letter );
-        }
+        //el.empty();
+        const dataset = el.get(0).dataset;
+        delete dataset.piece;
+        delete dataset.side;
 
         for (let id in pieces) {
             el.removeClass( `fa-chess-${pieces[id]}` );
@@ -292,21 +272,12 @@ class Chessboard {
         dataset.piece = piece;
         dataset.side = side;
 
-        if (Chessboard.BOARD_PARAMS_ID.startsWith( 'letterPiece' )) {
-            el.empty();
-            let letter = Chessboard.letterPiece[ side ][ piece ];
-            if (el.hasClass('even') && Chessboard.BOARD_PARAMS_ID === 'letterPieceAll') {
-                letter = letter.toUpperCase();
-            }
-            el.append( letter );
-        }
-        else {
-            el.addClass( side )
-                .addClass( `fa-chess-${piece}` );
-        }
-
         el.mousedown( () => {
             this.clickedCell = el;
+        });
+
+        el.dblclick( () => {
+            this.clearPiece( dataset.location );
         });
 
         return this;
@@ -372,6 +343,41 @@ class Chessboard {
         this.clearPiece( from );
 
         return this;
+    }
+
+    toString() {
+        return this.cells.reduce( (acc, cell) => {
+            const { piece, side } = cell.get(0).dataset;
+            if (piece) {
+                return acc + Chessboard.pieceLetter[ side ][ piece ];
+            }
+            else {
+                return acc + cell.text();
+            }
+        }, '' );
+    }
+
+    fromString( str ) {
+        if ( str.length != 64) {
+            return false;
+        }
+
+        this.clear();
+
+        let index = 0;
+        for (let row = 0; row < 8; row++) {
+            for (let col = 0; col < 8; col++) {
+                const value = str[ index ];
+
+                if (value > 'A' && value < 'z') {
+                    const location = this.cells[ index ].get(0).dataset.location;
+                    const { piece, side } = Chessboard.letterPiece[ value ];
+                    this.setPiece( location, piece, side );
+                }
+
+                index++;
+            }
+        }
     }
 
     _createHSideCell( cell ) {

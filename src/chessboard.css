@@ -1,28 +1,3 @@
-@font-face {
-    font-family: Kingdom;
-    src: url(fonts/kingdom.ttf);
-}
-
-@font-face {
-    font-family: Cases;
-    src: url(fonts/cases.ttf);
-}
-
-@font-face {
-    font-family: Leipzig;
-    src: url(fonts/leipzig.ttf);
-}
-
-@font-face {
-    font-family: Maya;
-    src: url(fonts/maya.ttf);
-}
-
-@font-face {
-    font-family: Merida;
-    src: url(fonts/merida.ttf);
-}
-
 :root {
     --cell-size: 34px;
     --board-size: calc(var(--cell-size) * 8);
@@ -100,6 +75,45 @@ body {
 
 .cell[data-piece] {
     cursor: pointer;
+    background-size: calc(6 * var(--cell-size)) calc(2 * var(--cell-size));
+    background-image: url(pieces.png);
+}
+
+.cell[data-piece='queen'][data-side='white'] {
+    background-position: 0 0;
+}
+.cell[data-piece='king'][data-side='black'] {
+    background-position: calc(-1 * var(--cell-size)) 0;
+}
+.cell[data-piece='rook'][data-side='black'] {
+    background-position: calc(-2 * var(--cell-size)) 0;
+}
+.cell[data-piece='bishop'][data-side='black'] {
+    background-position: calc(-3 * var(--cell-size)) 0;
+}
+.cell[data-piece='knight'][data-side='black'] {
+    background-position: calc(-4 * var(--cell-size)) 0;
+}
+.cell[data-piece='pawn'][data-side='black'] {
+    background-position: calc(-5 * var(--cell-size)) 0;
+}
+.cell[data-piece='queen'][data-side='white'] {
+    background-position: 0 calc(-1 * var(--cell-size));
+}
+.cell[data-piece='king'][data-side='white'] {
+    background-position: calc(-1 * var(--cell-size)) calc(-1 * var(--cell-size));
+}
+.cell[data-piece='rook'][data-side='white'] {
+    background-position: calc(-2 * var(--cell-size)) calc(-1 * var(--cell-size));
+}
+.cell[data-piece='bishop'][data-side='white'] {
+    background-position: calc(-3 * var(--cell-size)) calc(-1 * var(--cell-size));
+}
+.cell[data-piece='knight'][data-side='white'] {
+    background-position: calc(-4 * var(--cell-size)) calc(-1 * var(--cell-size));
+}
+.cell[data-piece='pawn'][data-side='white'] {
+    background-position: calc(-5 * var(--cell-size)) calc(-1 * var(--cell-size));
 }
 
 .cell.even {
@@ -110,35 +124,13 @@ body {
     background-color: #fff;
 }
 
-.white {
-    color: #fff;
-    text-shadow: 2px 0px #000, -2px 0px #000, 0px 2px #000, 0px -2px #000;
-    font-size: 16pt;
-}
-
-.black {
-    color: #222;
-}
-
-.letterPieceAll {
-    font-family: Leipzig, Consolas, monospace;
-    font-size: var(--cell-size);
-    background-color: #fff !important;
-    color: #666;
-}
-
-.letterPiece {
-    font-family: Leipzig, Consolas, monospace;
-    font-size: var(--cell-size);
-    color: #222;
-}
-
-.hidden {
+.cell.hidden {
     display: none;
 }
 
 .moving {
-    position: absolute;
+    position: fixed;
+    width: var(--cell-size);
+    height: var(--cell-size);
     pointer-events: none;
-    background: rgba(0, 0, 0, 0) !important;
 }
