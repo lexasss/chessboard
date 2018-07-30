@@ -88,10 +88,10 @@ body {
 .cell[data-piece='rook'][data-side='black'] {
     background-position: calc(-2 * var(--cell-size)) 0;
 }
-.cell[data-piece='bishop'][data-side='black'] {
+.cell[data-piece='knight'][data-side='black'] {
     background-position: calc(-3 * var(--cell-size)) 0;
 }
-.cell[data-piece='knight'][data-side='black'] {
+.cell[data-piece='bishop'][data-side='black'] {
     background-position: calc(-4 * var(--cell-size)) 0;
 }
 .cell[data-piece='pawn'][data-side='black'] {
@@ -106,10 +106,10 @@ body {
 .cell[data-piece='rook'][data-side='white'] {
     background-position: calc(-2 * var(--cell-size)) calc(-1 * var(--cell-size));
 }
-.cell[data-piece='bishop'][data-side='white'] {
+.cell[data-piece='knight'][data-side='white'] {
     background-position: calc(-3 * var(--cell-size)) calc(-1 * var(--cell-size));
 }
-.cell[data-piece='knight'][data-side='white'] {
+.cell[data-piece='bishop'][data-side='white'] {
     background-position: calc(-4 * var(--cell-size)) calc(-1 * var(--cell-size));
 }
 .cell[data-piece='pawn'][data-side='white'] {

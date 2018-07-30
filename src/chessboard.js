@@ -22,10 +22,10 @@ class Chessboards {
 
         this._boards = [];
 
-        const app = $(selector).addClass('main-container');
+        this.app = $( selector ).addClass( 'main-container' );
         for (let row = 0; row < rows; row++) {
-            const rowHtml = $('<div>').addClass('main-container-row');
-            app.append( rowHtml );
+            const rowHtml = $( '<div>' ).addClass( 'main-container-row' );
+            this.app.append( rowHtml );
 
             for (let col = 0; col < columns; col++) {
                 this._boards.push( new Chessboard( `board-${row}-${col}`, rowHtml ) );
@@ -36,6 +36,16 @@ class Chessboards {
     get boards() {
         return this._boards;
     }
+
+    add() {
+        const rowHtml = $( '<div>' ).addClass( 'main-container-row' );
+        this.app.append( rowHtml );
+
+        const board = new Chessboard( `board-${this._boards.length}`, rowHtml );
+        board.fill();
+        
+        this._boards.push( board );
+    }
 }
 
 
@@ -43,12 +53,12 @@ class Chessboards {
  * The layout created within the parental element:
  *
  * |-------------------------------------|
- * |   flex container with a-f labels    |
+ * |   flex container with a-h labels    |
  * |-------------------------------------|
  * |   |                             |   |
  * | 1 |                             | 1 |
  * | - |                             | - |
- * | 9 |    board: flex container    | 9 |
+ * | 8 |    board: flex container    | 8 |
  * |   |        with 64 cells,       |   |
  * | l |                             | l |
  * | a |                             | a |
@@ -58,7 +68,7 @@ class Chessboards {
  * | s |                             | s |
  * |   |                             |   |
  * |-------------------------------------|
- * |   flex container with a-f labels    |
+ * |   flex container with a-h labels    |
  * |-------------------------------------|
 */
 class Chessboard {
