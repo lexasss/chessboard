@@ -5,11 +5,16 @@
         <meta charset="UTF-8">
 
         <link rel="stylesheet" href="chessboard.css" type="text/css">
+        <!--link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.min.css" type="text/css"-->
 
     	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
         <script src="chessboard.js" type="text/javascript"></script>
         <script type="text/javascript">
         	$(() => {
+                const container = new Chessboards( '#boards' );
+                container.load();
+
+                /*
                 const container = new Chessboards( '#app', 2, 3 );
 
                 const p = Chessboard.piece;
@@ -62,10 +67,17 @@
                 container.boards[3].fill();
 
                 container.boards[4].fromString( container.boards[0].toString() );
+                */
+                window.addEventListener( 'beforeunload', e => {
+                    container.save();
+                });
             });
+
         </script>
     </head>
     <body>
-    	<div id="app"></div>
+        <div id="boards">
+            <div id="add" class="add">Add</div>
+        </div>
     </body>
 </htnl>

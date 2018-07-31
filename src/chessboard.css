@@ -1,12 +1,12 @@
 :root {
     --cell-size: 34px;
     --board-size: calc(var(--cell-size) * 8);
-    --frame-size: 1em;
+    --frame-size: 20px;
 }
 
 body {
 	background-color: #fff;
-	font: bold 14pt Calibri, Arial, sans-serif;
+	font: bold var(--frame-size) Calibri, Arial, sans-serif;
     color: #444;
 	text-align: center;
     padding: 0;
@@ -15,7 +15,8 @@ body {
 
 .main-container {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    flex-wrap: wrap;
 }
 
 .main-container-row {
@@ -28,6 +29,41 @@ body {
 
 .board-container {
     background-color: #999;
+    position: relative;
+    margin: 1em;
+}
+
+.add {
+    background-color: #999;
+    color: #eee;
+
+	font: bold 28px Calibri, Arial, sans-serif;
+
+    position: relative;
+    margin: 1rem;
+    width: calc( 2 * var(--frame-size) + 8 * var(--cell-size) );
+    height: calc( 2 * var(--frame-size) + 8 * var(--cell-size) );
+
+    line-height:  calc( 2 * var(--frame-size) + 8 * var(--cell-size) );
+    vertical-align: 50%;
+    cursor: pointer;
+}
+
+.remove {
+    position: absolute;
+    display: inline-block;
+    cursor: pointer;
+
+    background-color: #822;
+    color: #ccc;
+    font-weight: bold;
+
+    text-align: center;
+    line-height: calc( 0.8 * var(--frame-size) );
+    width: var(--frame-size);
+    height: var(--frame-size);
+    right: 0;
+    top: 0;
 }
 
 .rowBoard {
@@ -63,7 +99,7 @@ body {
     width: var(--board-size);
     height: var(--board-size);
 
-    font-size: 18pt;
+    font-size: var(--frame-size);
     user-select: none;
 }
 

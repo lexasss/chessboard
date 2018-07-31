@@ -1,36 +1,16 @@
 /**
  * The layout created within the parental element:
- *
- * |---------------------------------------
- * |         vertical flex container
- * |  |-------------|  |-------------|  |--
- * |  |             |  |             |  |
- * |  |             |  |             |  |
- * |  |    board    |  |    board    |  |
- * |  |             |  |             |  |
- * |  |             |  |             |  |
- * |  |-------------|  |-------------|  |--
- * |
- * |---------------------------------------
- * |         vertical flex container
- * |  |-------------|  |-------------|  |--
- * |  |             |  |             |  |
-*/
+ */
 class Chessboards {
 
-    constructor( selector, columns, rows ) {
-
+    constructor( selector ) {
         this._boards = [];
-
         this.app = $( selector ).addClass( 'main-container' );
-        for (let row = 0; row < rows; row++) {
-            const rowHtml = $( '<div>' ).addClass( 'main-container-row' );
-            this.app.append( rowHtml );
 
-            for (let col = 0; col < columns; col++) {
-                this._boards.push( new Chessboard( `board-${row}-${col}`, rowHtml ) );
-            }
-        }
+        this.addButton = $( this.app.children( '#add' )[0] );
+        this.addButton.click( e => {
+            this.add();
+        });
     }
 
     get boards() {
@@ -38,13 +18,47 @@ class Chessboards {
     }
 
     add() {
-        const rowHtml = $( '<div>' ).addClass( 'main-container-row' );
-        this.app.append( rowHtml );
-
-        const board = new Chessboard( `board-${this._boards.length}`, rowHtml );
-        board.fill();
-        
+        const board = new Chessboard( `board-${this._getRandomInt(1000000)}`, id => {
+            this.remove( id );
+        });
+        board.container.insertBefore( this.addButton );
         this._boards.push( board );
+        
+        board.fill();
+
+        this.save();
+    }
+
+    remove( id ) {
+        $( `#${id}` ).remove();
+        this._boards = this._boards.filter( board => board.id !== id );
+        this.save();
+    }
+
+    save() {
+        const boards = {};
+        this._boards.forEach( board => {
+            boards[ board.id ] = board.toString();
+        });
+
+        localStorage.setItem( 'boards', JSON.stringify( boards ) );
+    }
+
+    load() {
+        const boards = JSON.parse( localStorage.getItem( 'boards' ) );
+        for (let id in boards) {
+            const board = new Chessboard( id, id => {
+                this.remove( id );
+            });
+            board.container.insertBefore( this.addButton );
+            this._boards.push( board );
+
+            board.fromString( boards[ id ] );
+        }
+    }
+
+    _getRandomInt( max ) {
+        return Math.floor( Math.random() * Math.floor( max ) );
     }
 }
 
@@ -73,15 +87,14 @@ class Chessboards {
 */
 class Chessboard {
 
-    constructor( id, parent ) {
+    constructor( id, onDelete ) {
 
         this.id = id;
 
         // DOM creation
 
         // Board
-        const container = $( '<div>' ).addClass( 'board-container' );
-        parent.append( container );
+        this.container = $( `<div id="${id}">` ).addClass( 'board-container' );
 
         // Sides
         const hsideTop = $( '<div>' ).addClass( 'h-side' );
@@ -101,7 +114,7 @@ class Chessboard {
         // Cells
         this.cells = [];
 
-        this.board = $( `<div id="${id}"> `).addClass( 'board' );
+        this.board = $( `<div>` ).addClass( 'board' );
         for (let row = 0; row < 8; row++) {
             for (let col = 0; col < 8; col++) {
                 const location = String.fromCharCode( 0x61 + col ) + (8 - row);
@@ -132,14 +145,20 @@ class Chessboard {
         rowBoard.append( this.board );
         rowBoard.append( vsideRight );
 
-        container.append( hsideTop );
-        container.append( rowBoard );
-        container.append( hsideBottom );
+        this.container.append( hsideTop );
+        this.container.append( rowBoard );
+        this.container.append( hsideBottom );
+
+        // Close-button
+        const remove = $( '<div>' ).addClass( 'remove' ).text( 'x' );
+        this.container.append( remove );
 
         // EVENT HANDLERS
 
         this.board.mousemove( e => {
             if (e.buttons === 1 && this.clickedCell) {
+                e.preventDefault();
+                e.stopPropagation();
                 if (this.movingPiece.hasClass( 'hidden' )) {
                     const dataset = this.clickedCell.get(0).dataset;
                     this.movingPiece.get(0).dataset.piece = dataset.piece;
@@ -173,6 +192,12 @@ class Chessboard {
 
             this.clickedCell = null;
         });
+
+        if (onDelete) {
+            remove.click( e => {
+                onDelete( id );
+            } );
+        }
     }
 
     static get piece() {
@@ -248,14 +273,10 @@ class Chessboard {
         const pieces = Chessboard.piece;
         const side = Chessboard.side;
 
-        //el.empty();
         const dataset = el.get(0).dataset;
         delete dataset.piece;
         delete dataset.side;
 
-        for (let id in pieces) {
-            el.removeClass( `fa-chess-${pieces[id]}` );
-        }
         for (let id in side) {
             el.removeClass( side[id] );
         }
@@ -282,11 +303,13 @@ class Chessboard {
         dataset.piece = piece;
         dataset.side = side;
 
-        el.mousedown( () => {
+        el.mousedown( e => {
             this.clickedCell = el;
+            e.preventDefault();
+            e.stopPropagation();
         });
 
-        el.dblclick( () => {
+        el.dblclick( e => {
             this.clearPiece( dataset.location );
         });
 
